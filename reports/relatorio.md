@@ -1,5 +1,3 @@
----
-
 # Relatório Técnico — Laboratório 02: Um Estudo das Características de Qualidade de Sistemas Java
 
 **Disciplina:** Laboratório de Experimentação de Software  
