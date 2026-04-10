@@ -1,82 +1,75 @@
-# 📦 Laboratório 02 - Coletor de Métricas Java & Análise Estática
+# 📊 Laboratório 02: Evolução e Qualidade de Sistemas Java Open-Source
 
-Uma ferramenta de automação desenvolvida em Python para coletar dados dos 1.000 repositórios **Java** mais populares do GitHub e automatizar a extração de métricas de qualidade de software utilizando a ferramenta de análise estática [CK](https://github.com/mauricioaniche/ck).
+## 📝 Sobre o Projeto
+Este repositório contém a infraestrutura de mineração, extração e análise de dados desenvolvida para o **Laboratório 02** da disciplina de Laboratório de Experimentação de Software (Engenharia de Software). 
 
-Este projeto é referente à entrega **Lab02S01** da disciplina de Laboratório de Experimentação de Software.
+O objetivo principal do estudo foi investigar empiricamente se características do ciclo de vida de repositórios open-source no GitHub (popularidade, maturidade, frequência de *releases* e tamanho em linhas de código) impactam a qualidade estrutural interna de sistemas desenvolvidos em Java. 
 
-## ✨ Funcionalidades
+A pesquisa analisou os **1.000 repositórios Java mais populares**, extraindo a Árvore de Sintaxe Abstrata (AST) via ferramenta **CK** para calcular as medianas das métricas CBO (Acoplamento), DIT (Herança) e LCOM (Falta de Coesão), culminando na aplicação de testes de **Correlação de Spearman**.
 
-- **Coleta de Dados:** Busca os top-1.000 repositórios Java ordenados por popularidade (estrelas).
-- **Múltiplos Métodos de Coleta:** Suporte para uso da API Direta (GraphQL via HTTP) ou integração com o binário local do GitHub CLI (`gh`).
-- **Automação de Análise Estática:** Realiza o clone automatizado (shallow clone) de repositórios listados e executa o `ck.jar` para extrair métricas de qualidade de produto (CBO, DIT, LCOM, LOC).
-- **Exportação Flexível:** Salva os dados processados em arquivos `.csv` e `.json` para análises futuras.
-- **Tratamento de Falhas:** Limpeza garantida de arquivos temporários e tratamento robusto de *timeouts* e paginação da API do GitHub.
+## 🛠️ Tecnologias Utilizadas
+* **Linguagem:** Python 3.10+
+* **Coleta de Dados:** API GraphQL do GitHub
+* **Extração de Métricas:** Ferramenta de análise estática [CK (Aniche et al., 2021)](https://github.com/mauricioaniche/ck)
+* **Análise de Dados e Estatística:** `pandas`, `scipy.stats`
+* **Visualização de Dados:** `matplotlib`, `seaborn`
+* **Geração de Relatório:** `markdown`, `WeasyPrint` (renderização de PDF avançada)
+* **Ambiente Recomendado:** Linux / WSL (Windows Subsystem for Linux)
 
-## 📋 Pré-requisitos
+## 📁 Estrutura do Repositório
 
-Certifique-se de ter as seguintes ferramentas instaladas no seu sistema:
-
-- **Python 3.8+**
-- **Git** (para realizar os clones automatizados)
-- **Java (JDK/JRE 11+)** (necessário para executar a ferramenta CK)
-- [GitHub CLI (gh)](https://cli.github.com/) *(Opcional, mas recomendado para o método CLI)*
-
-## 🚀 Como Configurar
-
-1. **Clone este repositório** para a sua máquina local.
-2. **Crie e ative um ambiente virtual:**
-   ```bash
-   python -m venv venv
-   # No Windows:
-   venv\Scripts\activate
-   # No Linux/Mac:
-   source venv/bin/activate
-3.  **Instale as dependências:**
-    
-    Bash
-    
-    ```
-    pip install -r requirements.txt
-    
-    ```
-    
-4.  **Configuração de Autenticação:**
-    
-    -   Crie uma cópia do arquivo `.env.example` e renomeie para `.env`.
-        
-    -   Adicione o seu _Personal Access Token_ do GitHub: `GITHUB_TOKEN=seu_token_aqui`
-        
-5.  **Configuração do CK:**
-    
-    -   Obtenha ou compile o arquivo `ck.jar` contendo suas dependências.
-        
-    -   Coloque o arquivo `ck.jar` na **raiz** do projeto (mesmo nível do diretório `src/`).
-        
-
-## 💻 Como Usar
-
-Execute a aplicação como um módulo Python a partir da raiz do projeto, utilizando a flag `--csv` para garantir a geração do arquivo que a automação precisa ler:
-
-Bash
-
-```
-python -m src.app --csv
-
+```text
+├── data/                       # Arquivos CSV brutos e consolidados (métricas do CK)
+├── reports/                    # Artefatos gerados
+│   ├── figures/                # Gráficos (Dispersão, Boxplots, Heatmaps, Histogramas)
+│   ├── relatorio.md            # Relatório técnico em Markdown
+│   └── relatorio.pdf           # Relatório final renderizado
+├── src/                        # Código fonte do projeto
+│   ├── analysis/               # Scripts de análise estatística e geração de gráficos
+│   └── utils/
+│       └── md_to_pdf.py        # Script de automação para renderização do relatório
+├── .gitignore
+├── requirements.txt            # Dependências Python do projeto
+└── README.md
 ```
 
-Um menu interativo será exibido no terminal:
+## 🚀 Como Executar o Projeto
 
--   **Opções [1] e [2]:** Coletam a lista dos repositórios Java e geram o arquivo `data/repos.csv`.
-    
--   **Opção [3]:** Lê o arquivo gerado, clona o primeiro repositório da lista de forma temporária e executa a análise do CK, gerando os relatórios de qualidade (`class.csv`, `method.csv`, etc.) na pasta `data/ck_results/`.
-    
+Para garantir a estabilidade das bibliotecas de renderização de PDF (WeasyPrint) e evitar conflitos de sistema, **recomenda-se fortemente a execução em ambiente Linux/WSL**.
 
-## 🏗️ Arquitetura e Padrões de Projeto
+### 1. Pré-requisitos de Sistema (Debian/Ubuntu)
+Instale as bibliotecas gráficas nativas necessárias para a formatação do PDF e gerenciamento de pacotes:
+```bash
+sudo apt update
+sudo apt install -y python3-venv python3-full libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b libffi-dev
+```
 
-A base de código foi estruturada visando extensibilidade e manutenção, utilizando princípios **SOLID** e os seguintes _Design Patterns_:
+### 2. Configuração do Ambiente Virtual
+Clone o repositório e crie um ambiente virtual isolado (PEP 668):
+```bash
+git clone https://github.com/JoaoYM/lab-exp-softw-2
+cd lab-exp-softw-2
+python3 -m venv .venv
+source .venv/bin/activate
+```
 
--   **Factory Method:** (`RepositoryFetcherFactory`) Instancia o método de coleta correto com base na escolha do usuário sem acoplar a lógica de criação.
-    
--   **Strategy:** As classes de _fetchers_ implementam a interface `BaseRepositoryFetcher`, permitindo que a lógica de negócio execute requisições sem se importar se está usando HTTP puro ou o CLI.
-    
--   **Facade:** (`RepositoryManager`) Oculta a complexidade da orquestração entre a coleta de dados, padronização e exibição/exportação no terminal.
+### 3. Instalação das Dependências
+Com o `.venv` ativado, instale os pacotes Python:
+```bash
+pip install -r requirements.txt
+```
+*(Caso não tenha o arquivo `requirements.txt` estruturado, instale manualmente: `pip install pandas matplotlib seaborn scipy markdown weasyprint`)*
+
+### 4. Geração das Análises Estatísticas e Gráficos
+Para processar o arquivo `ck_metrics_consolidated.csv` e gerar todos os testes de hipótese (Spearman), Boxplots e Histogramas na pasta `reports/figures/`, execute:
+```bash
+python src/analysis/data_analyzer.py
+```
+*(Substitua o caminho do script acima pelo nome exato do seu arquivo de análise).*
+
+### 5. Renderização do Relatório (PDF)
+Para consolidar os achados e gerar o relatório final de submissão no formato exigido:
+```bash
+python src/utils/md_to_pdf.py
+```
+O arquivo `relatorio.pdf` será gerado automaticamente na pasta `reports/` com formatação e paginação acadêmica.
